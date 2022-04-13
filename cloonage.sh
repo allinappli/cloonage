@@ -8,8 +8,8 @@
 ##
 ################################################
 
-
-source functions1.sh
+cd ..
+source cloonage/functions1.sh
 
 echo -e '\e[93m=============================================\033[0m'
 echo "Choisissez l'instance que vous vouler clonner ?"
