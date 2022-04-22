@@ -51,6 +51,10 @@ echo "Nom de l'utilisateur de l'instance ou elle va etre clonner ?"
 read mysql_destination_user
 echo -e '\e[93m=============================================\033[0m'
 
+echo -e '\e[93m=============================================\033[0m'
+echo "MDP de l'utilisateur de l'instance ou elle va etre clonner ?"
+read mysql_destination_mdp
+echo -e '\e[93m=============================================\033[0m'
 
 
 cd $folder_clone/httpdocs
@@ -81,6 +85,22 @@ rm -rf $folder_clone.zip
 rm -rf $folder_clone.sql
 rm -rf httpdocs
 
+
+# Modify website url
+echo -e '\e[93m================================================\033[0m'
+echo "Instalation de BDSearch"
+wget https://github.com/DvdGiessen/DBSR/releases/download/2.2.0/DBSearchReplace-CLI.php
+touch config.json
+echo '{ "options": { "CLI": { "output": "json" }, "PDO": {"hostname": "localhost", "port": 3306, "username": "'$mysql_destination_user'", "password": "'$mysql_destination_mdp'", "database": "'$mysql_destination_database'", "charset": "utf8" }, "DBSR": { "case-insensitive": false, "extensive-search": false, "search-page-size": 10000, "var-match-strict": true, "floats-precision": 5, "convert-charsets": true, "var-cast-replace": true, "db-write-changes": true, "handle-serialize": true } }, "search": ["https://'$folder_clone'"], "replace": ["https://'$folder_destination'"] }' | jq '.' > config.json
+echo "Ouvrir ce lien afin de modifier les datas :" https://$folder_destination/DBSearchReplace-CLI.php?args=--file+config.json
+echo -e '\e[93m================================================\033[0m'
+
+sed -i "s/`echo $mysql_clone_database`/`echo $mysql_destination_database`/" wp-config.php
+
+cd wp-content/uploads/civicrm
+sed -i "s/`echo $mysql_clone_database`/`echo $mysql_destination_database`/" civicrm.settings.php
+
+# # sudo nano wp-config.php
 echo -e '\e[93m================================================\033[0m'
 echo -e '\e[1;32m Site cloner \032'
 echo -e '\e[93m================================================\033[0m'
