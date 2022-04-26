@@ -1,10 +1,10 @@
 #!/bin/bash
 ##
-## Développer par Renaud Fradin est Fawzy Elsam
+## Développé par Renaud Fradin et Fawzy Elsam
 ##
 ################################################
 ##
-##  Cloonage site
+##  Clonage site
 ##
 ################################################
 
@@ -12,7 +12,7 @@ cd ..
 source cloonage/functions1.sh
 
 echo -e '\e[93m=============================================\033[0m'
-echo "Choisissez l'instance que vous vouler clonner ?"
+echo "Choisissez l'instance à cloner ?"
 echo "Liste des domaines disponibles : "
 echo " "
 listSite=$(plesk bin site --list);
@@ -22,17 +22,17 @@ read folder_clone
 echo -e '\e[93m=============================================\033[0m'
 
 echo -e '\e[93m=============================================\033[0m'
-echo "Nom de la base de donnés de l'instance a clonner ?"
+echo "Nom de la base de données de l'instance à cloner ?"
 read mysql_clone_database
 echo -e '\e[93m=============================================\033[0m'
 
 echo -e '\e[93m=============================================\033[0m'
-echo "Nom de l'utilisateur de l'instance a clonner ?"
+echo "Nom de l'utilisateur de l'instance à cloner ?"
 read mysql_clone_user
 echo -e '\e[93m=============================================\033[0m'
 
 echo -e '\e[93m=============================================\033[0m'
-echo "Choisissez ou cette instance doit etre cloner ?"
+echo "Choisissez où cette instance doit être clonée ?"
 echo "Liste des domaines disponibles : "
 echo " "
 listSite=$(plesk bin site --list);
@@ -42,17 +42,17 @@ read folder_destination
 echo -e '\e[93m=============================================\033[0m'
 
 echo -e '\e[93m=============================================\033[0m'
-echo "Nom de la base de donnés de l'instance ou elle va etre clonner ?"
+echo "Nom de la base de données de l'instance cible ?"
 read mysql_destination_database
 echo -e '\e[93m=============================================\033[0m'
 
 echo -e '\e[93m=============================================\033[0m'
-echo "Nom de l'utilisateur de l'instance ou elle va etre clonner ?"
+echo "Nom de l'utilisateur de l'instance cible ?"
 read mysql_destination_user
 echo -e '\e[93m=============================================\033[0m'
 
 echo -e '\e[93m=============================================\033[0m'
-echo "MDP de l'utilisateur de l'instance ou elle va etre clonner ?"
+echo "MDP de l'utilisateur de l'instance cible ?"
 read mysql_destination_mdp
 echo -e '\e[93m=============================================\033[0m'
 
@@ -88,19 +88,20 @@ rm -rf httpdocs
 
 # Modify website url
 echo -e '\e[93m================================================\033[0m'
-echo "Instalation de BDSearch"
+echo "Installation DBSearchReplace"
 wget https://github.com/DvdGiessen/DBSR/releases/download/2.2.0/DBSearchReplace-CLI.php
 touch config.json
 echo '{ "options": { "CLI": { "output": "json" }, "PDO": {"hostname": "localhost", "port": 3306, "username": "'$mysql_destination_user'", "password": "'$mysql_destination_mdp'", "database": "'$mysql_destination_database'", "charset": "utf8" }, "DBSR": { "case-insensitive": false, "extensive-search": false, "search-page-size": 10000, "var-match-strict": true, "floats-precision": 5, "convert-charsets": true, "var-cast-replace": true, "db-write-changes": true, "handle-serialize": true } }, "search": ["https://'$folder_clone'"], "replace": ["https://'$folder_destination'"] }' | jq '.' > config.json
 echo "Ouvrir ce lien afin de modifier les datas :" https://$folder_destination/DBSearchReplace-CLI.php?args=--file+config.json
 echo -e '\e[93m================================================\033[0m'
 
+#update wp-config
 sed -i "s/`echo $mysql_clone_database`/`echo $mysql_destination_database`/" wp-config.php
 
 cd wp-content/uploads/civicrm
+#update civicrm.setting.php
 sed -i "s/`echo $mysql_clone_database`/`echo $mysql_destination_database`/" civicrm.settings.php
 
-# # sudo nano wp-config.php
 echo -e '\e[93m================================================\033[0m'
-echo -e '\e[1;32m Site cloner \032'
+echo -e '\e[1;32m Site cloné \032'
 echo -e '\e[93m================================================\033[0m'
